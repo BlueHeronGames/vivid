@@ -249,6 +249,54 @@ body {
     transform: translateY(0);
 }
 
+.choice-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg-secondary);
+}
+
+/* Dungeon Button (special styling) */
+.dungeon-button {
+    background: linear-gradient(to bottom, #4a0e0e, #2a0808);
+    border-color: #8b0000;
+    color: #ff6b6b;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+}
+
+.dungeon-button:hover {
+    background: linear-gradient(to bottom, #6a1e1e, #4a0e0e);
+    border-color: #ff0000;
+    color: #ff8888;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+}
+
+/* Newly Unlocked Button (special styling) */
+.newly-unlocked-button {
+    background: linear-gradient(to bottom, #4a2e0e, #2a1808);
+    border-color: #d4af37;
+    color: #ffd700;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.newly-unlocked-button:hover {
+    background: linear-gradient(to bottom, #6a3e1e, #4a2e0e);
+    border-color: #ffcc00;
+    color: #ffee88;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.7);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.8);
+    }
+}
+
 /* Dialog Overlay */
 .dialog-overlay {
     position: fixed;

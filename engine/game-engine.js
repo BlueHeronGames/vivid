@@ -7,6 +7,7 @@ class GameEngine {
     constructor() {
         this.gameData = null;
         this.currentLocation = null;
+        this.currentLocationId = null;
         this.party = [];
         this.inventory = {};
         this.equipment = {}; // Track equipped items per character
@@ -14,6 +15,7 @@ class GameEngine {
         this.visited = new Set();
         this.gold = 0;
         this.experience = 0;
+        this.saveKey = 'vivid_game_save';
         
         // UI Elements
         this.locationNameEl = null;
@@ -48,8 +50,9 @@ class GameEngine {
             // Setup UI
             this.setupUI();
             
-            // Start at the starting location
-            await this.goToLocation(this.gameData.StartingLocationId);
+            // Start at the saved location or starting location
+            const startLocation = this.currentLocationId || this.gameData.StartingLocationId;
+            await this.goToLocation(startLocation);
             
             this.hideLoading();
         } catch (error) {
@@ -72,6 +75,13 @@ class GameEngine {
      * Initialize the game state from game data
      */
     initializeGameState() {
+        // Try to load saved game first
+        if (this.loadGame()) {
+            console.log('Loaded saved game');
+            return;
+        }
+        
+        // No save found, start new game
         if (this.gameData.StartingParty) {
             this.party = JSON.parse(JSON.stringify(this.gameData.StartingParty));
         }
@@ -103,6 +113,7 @@ class GameEngine {
         // Setup status bar buttons
         const partyButton = document.getElementById('party-button');
         const inventoryButton = document.getElementById('inventory-button');
+        const newGameButton = document.getElementById('new-game-button');
         
         if (partyButton) {
             partyButton.onclick = () => this.showPartyScreen();
@@ -120,6 +131,16 @@ class GameEngine {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     this.showInventoryScreen();
+                }
+            };
+        }
+        
+        if (newGameButton) {
+            newGameButton.onclick = () => this.confirmNewGame();
+            newGameButton.onkeydown = (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.confirmNewGame();
                 }
             };
         }
@@ -152,7 +173,11 @@ class GameEngine {
             }
             
             this.currentLocation = await response.json();
+            this.currentLocationId = locationId;
             this.visited.add(locationId);
+            
+            // Save game after location change
+            this.saveGame();
             
             // Render the location
             this.renderLocation();
@@ -196,14 +221,6 @@ class GameEngine {
         
         const choices = [];
         
-        // Check if this is a dungeon location
-        if (this.currentLocation.IsDungeon) {
-            choices.push({
-                text: 'Enter Dungeon',
-                action: () => this.enterDungeon()
-            });
-        }
-        
         // Add location links
         if (this.currentLocation.LinkedLocations) {
             this.currentLocation.LinkedLocations.forEach(link => {
@@ -212,9 +229,13 @@ class GameEngine {
                     return; // Skip this choice
                 }
                 
+                // Check if this location was just unlocked (switch required and not visited)
+                const isNewlyUnlocked = link.SwitchRequired && !this.visited.has(link.Id);
+                
                 choices.push({
-                    text: link.Description || link.Id,
-                    action: () => this.goToLocation(link.Id)
+                    text: isNewlyUnlocked ? `${link.Description} *` : (link.Description || link.Id),
+                    action: () => this.goToLocation(link.Id),
+                    type: isNewlyUnlocked ? 'newly-unlocked' : 'normal'
                 });
             });
         }
@@ -233,7 +254,8 @@ class GameEngine {
         if (this.currentLocation.Shop) {
             choices.push({
                 text: 'Browse Shop',
-                action: () => this.openShop()
+                action: () => this.openShop(),
+                type: 'normal'
             });
         }
         
@@ -241,14 +263,33 @@ class GameEngine {
         if (this.currentLocation.PricePerNight) {
             choices.push({
                 text: `Rest at Inn (${this.currentLocation.PricePerNight} gold)`,
-                action: () => this.restAtInn()
+                action: () => this.restAtInn(),
+                type: 'normal'
             });
         }
         
-        // Render choice buttons
-        choices.forEach((choice, index) => {
+        // Check if this is a dungeon location - ADD AT END SO IT APPEARS FIRST
+        if (this.currentLocation.IsDungeon) {
+            choices.push({
+                text: '⚔️ Enter Dungeon *',
+                action: () => this.enterDungeon(),
+                type: 'dungeon'
+            });
+        }
+        
+        // Render choice buttons (reverse so dungeon appears first)
+        choices.reverse().forEach((choice, index) => {
             const button = document.createElement('button');
-            button.className = 'choice-button';
+            
+            // Apply appropriate styling
+            if (choice.type === 'dungeon') {
+                button.className = 'choice-button dungeon-button';
+            } else if (choice.type === 'newly-unlocked') {
+                button.className = 'choice-button newly-unlocked-button';
+            } else {
+                button.className = 'choice-button';
+            }
+            
             button.textContent = choice.text;
             button.tabIndex = 0;
             button.onclick = choice.action;
@@ -314,9 +355,11 @@ class GameEngine {
         switch (actionType) {
             case 'SetSwitchAction':
                 this.switches[action.SwitchName] = action.Value;
+                this.saveGame();
                 break;
             case 'GiveItemAction':
                 this.addToInventory(action.ItemName, action.Quantity || 1);
+                this.saveGame();
                 break;
             // Add more action types as needed
         }
@@ -539,6 +582,7 @@ class GameEngine {
         this.gold -= price;
         this.addToInventory(item.Name, 1);
         this.updateGoldDisplay();
+        this.saveGame();
         
         return true;
     }
@@ -814,15 +858,16 @@ class GameEngine {
     enterDungeon() {
         const dungeon = this.currentLocation;
         
-        // Initialize dungeon state
+        // Initialize dungeon state - start at floor 0 so first explore goes to floor 1
         this.dungeonState = {
-            currentFloor: 1,
+            currentFloor: 0,
             numFloors: dungeon.NumFloors || 5,
             monsters: dungeon.Monsters || [],
             name: dungeon.Name
         };
         
-        this.showDungeonFloor();
+        // Immediately start exploring (go to floor 1)
+        this.dungeonExplore();
     }
 
     /**
@@ -832,13 +877,18 @@ class GameEngine {
         // Clear main UI
         this.locationNameEl.textContent = `${this.dungeonState.name} - Floor ${this.dungeonState.currentFloor}`;
         this.locationImageEl.style.display = 'none';
-        this.descriptionEl.textContent = `You are on floor ${this.dungeonState.currentFloor} of ${this.dungeonState.numFloors}. What will you do?`;
+        
+        if (this.dungeonState.currentFloor === 0) {
+            this.descriptionEl.textContent = `You enter the dungeon. The air grows cold and you hear distant echoes. Prepare yourself for battle!`;
+        } else {
+            this.descriptionEl.textContent = `Floor ${this.dungeonState.currentFloor} of ${this.dungeonState.numFloors}. The dungeon grows darker as you venture deeper. What will you do?`;
+        }
         
         this.choicesEl.innerHTML = '';
         
         const exploreButton = document.createElement('button');
         exploreButton.className = 'choice-button';
-        exploreButton.textContent = 'Explore Further';
+        exploreButton.textContent = this.dungeonState.currentFloor === 0 ? 'Begin Exploration' : 'Explore Further';
         exploreButton.tabIndex = 0;
         exploreButton.onclick = () => this.dungeonExplore();
         exploreButton.onkeydown = (e) => {
@@ -997,9 +1047,22 @@ class GameEngine {
     }
 
     /**
+     * Disable all choice buttons
+     */
+    disableAllButtons() {
+        const buttons = this.choicesEl.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
+    }
+
+    /**
      * Player attacks monster
      */
     combatAttack(memberIndex) {
+        // Disable all buttons
+        this.disableAllButtons();
+        
         const member = this.party[memberIndex];
         const monster = this.currentCombat.monster;
         
@@ -1023,6 +1086,9 @@ class GameEngine {
             this.showQuickMessage('Not enough SP!');
             return;
         }
+        
+        // Disable all buttons
+        this.disableAllButtons();
         
         member.CurrentSkillPoints -= skill.Cost;
         
@@ -1109,6 +1175,7 @@ class GameEngine {
         this.gold += monster.Gold;
         this.experience += monster.ExperiencePoints;
         this.updateGoldDisplay();
+        this.saveGame();
         
         this.showDialog('Victory!', `You defeated ${monster.Name}!\n\nGained ${monster.Gold} gold and ${monster.ExperiencePoints} XP.`);
         
@@ -1141,6 +1208,152 @@ class GameEngine {
         this.dungeonState = null;
         
         setTimeout(() => this.renderLocation(), 3000);
+    }
+
+    /**
+     * Save game to localStorage
+     */
+    saveGame() {
+        try {
+            const saveData = {
+                currentLocationId: this.currentLocationId,
+                party: this.party,
+                inventory: this.inventory,
+                equipment: this.equipment,
+                switches: this.switches,
+                visited: Array.from(this.visited),
+                gold: this.gold,
+                experience: this.experience,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem(this.saveKey, JSON.stringify(saveData));
+        } catch (error) {
+            console.error('Failed to save game:', error);
+        }
+    }
+
+    /**
+     * Load game from localStorage
+     * @returns {boolean} - Whether a save was loaded
+     */
+    loadGame() {
+        try {
+            const savedData = localStorage.getItem(this.saveKey);
+            if (!savedData) {
+                return false;
+            }
+            
+            const saveData = JSON.parse(savedData);
+            
+            this.currentLocationId = saveData.currentLocationId;
+            this.party = saveData.party;
+            this.inventory = saveData.inventory;
+            this.equipment = saveData.equipment;
+            this.switches = saveData.switches;
+            this.visited = new Set(saveData.visited);
+            this.gold = saveData.gold;
+            this.experience = saveData.experience;
+            
+            return true;
+        } catch (error) {
+            console.error('Failed to load game:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Delete saved game
+     */
+    deleteSave() {
+        try {
+            localStorage.removeItem(this.saveKey);
+            this.showQuickMessage('Save deleted!');
+        } catch (error) {
+            console.error('Failed to delete save:', error);
+        }
+    }
+
+    /**
+     * Confirm starting a new game
+     */
+    confirmNewGame() {
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+        overlay.tabIndex = 0;
+        
+        const dialog = document.createElement('div');
+        dialog.className = 'dialog';
+        dialog.setAttribute('role', 'dialog');
+        
+        const title = document.createElement('h2');
+        title.textContent = 'Start New Game?';
+        title.tabIndex = 0;
+        
+        const message = document.createElement('p');
+        message.textContent = 'This will delete your current save. Are you sure?';
+        message.tabIndex = 0;
+        
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '15px';
+        buttonContainer.style.justifyContent = 'center';
+        
+        const confirmButton = document.createElement('button');
+        confirmButton.textContent = 'Yes, Start New Game';
+        confirmButton.className = 'dialog-close';
+        confirmButton.tabIndex = 0;
+        confirmButton.onclick = () => {
+            document.body.removeChild(overlay);
+            this.startNewGame();
+        };
+        
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.className = 'dialog-close';
+        cancelButton.style.backgroundColor = 'var(--bg-tertiary)';
+        cancelButton.tabIndex = 0;
+        cancelButton.onclick = () => {
+            document.body.removeChild(overlay);
+        };
+        
+        buttonContainer.appendChild(confirmButton);
+        buttonContainer.appendChild(cancelButton);
+        
+        dialog.appendChild(title);
+        dialog.appendChild(message);
+        dialog.appendChild(buttonContainer);
+        overlay.appendChild(dialog);
+        
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => cancelButton.focus(), 100);
+    }
+
+    /**
+     * Start a new game (reset everything)
+     */
+    async startNewGame() {
+        this.deleteSave();
+        
+        // Reset all state
+        this.party = [];
+        this.inventory = {};
+        this.equipment = {};
+        this.switches = {};
+        this.visited = new Set();
+        this.gold = 0;
+        this.experience = 0;
+        this.currentCombat = null;
+        this.dungeonState = null;
+        
+        // Re-initialize from game data
+        this.initializeGameState();
+        
+        // Go to starting location
+        await this.goToLocation(this.gameData.StartingLocationId);
+        
+        this.showQuickMessage('New game started!');
     }
 }
 
