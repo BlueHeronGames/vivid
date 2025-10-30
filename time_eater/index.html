@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Eater</title>
+    <meta name="description" content="A dark fantasy adventure game">
+    
+    <!-- Engine Styles -->
+    <link rel="stylesheet" href="../engine/styles.css">
+    
+    <!-- Custom Game Styles (optional) -->
+    <link rel="stylesheet" href="./custom-styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2 tabindex="0">Loading Time Eater...</h2>
+            <p tabindex="0">Preparing your adventure</p>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <div class="game-vbox">
+            <!-- Location Name -->
+            <h1 id="location-name" tabindex="0">Loading...</h1>
+            
+            <!-- Location Image -->
+            <div id="location-image-container">
+                <img id="location-image" src="" alt="" tabindex="0">
+            </div>
+            
+            <!-- Description -->
+            <div id="description-container">
+                <p id="description" tabindex="0">Loading location...</p>
+            </div>
+            
+            <!-- Choices -->
+            <div id="choices-container">
+                <div id="choices" role="group" aria-label="Available actions">
+                    <!-- Choice buttons will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Engine -->
+    <script src="../engine/game-engine.js"></script>
+    
+    <!-- Initialize Game -->
+    <script>
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const engine = new GameEngine();
+            engine.init('Game.json');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+    "Name": "Bronzebeard's Wares",
+    "Description": "The clang of hammer on anvil echoes through this sturdy shop. Weapons and armor of all kinds hang on the walls, each crafted with care.",
+    "ImageUrl": "https://via.placeholder.com/800x400/2a2a2a/8b4513?text=Bronzebeard's+Wares",
+    "LinkedLocations": [
+        {
+            "Id": "Locations/KingsVale/KingsVale",
+            "Description": "Back to King's Vale"
+        }
+    ],
+    "Shop": {
+        "ItemsForSale": [
+            {
+                "Name": "Iron Sword",
+                "Description": "A sturdy iron blade (+7 Strength)",
+                "Price": 200
+            },
+            {
+                "Name": "Iron Helmet",
+                "Description": "Protects your head (+3 Toughness)",
+                "Price": 100
+            },
+            {
+                "Name": "Iron Armour",
+                "Description": "Full body protection (+5 Toughness)",
+                "Price": 150
+            }
+        ]
+    }
+}

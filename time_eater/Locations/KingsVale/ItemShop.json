@@ -1,0 +1,26 @@
+{
+    "Name": "Potions R Us",
+    "Description": "A small room that smells like herbs and sounds like bubbles. Colorful potions line the shelves, each promising different effects.",
+    "ImageUrl": "https://via.placeholder.com/800x400/2a2a2a/8b4513?text=Potions+R+Us",
+    "BackgroundAudio": "bgse/bubbling",
+    "LinkedLocations": [
+        {
+            "Id": "Locations/KingsVale/KingsVale",
+            "Description": "Back to King's Vale"
+        }
+    ],
+    "Shop": {
+        "ItemsForSale": [
+            {
+                "Name": "Potion-A",
+                "Description": "Restores 50 HP",
+                "Price": 25
+            },
+            {
+                "Name": "Potion-B",
+                "Description": "Restores 100 HP and 25 SP",
+                "Price": 75
+            }
+        ]
+    }
+}

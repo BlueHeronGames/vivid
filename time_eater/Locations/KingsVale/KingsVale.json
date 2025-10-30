@@ -1,0 +1,48 @@
+{
+    "Name": "King's Vale",
+    "Description": "A small village ruled by King Sulayman, who lives in the castle in the north part of town.",
+    "ImageUrl": "https://via.placeholder.com/800x400/2a2a2a/8b4513?text=King's+Vale",
+    "BackgroundAudio": "bgse/seagulls",
+    "LinkedLocations": [
+        {
+            "Id": "Locations/KingsVale/Inn",
+            "Description": "The King's Inn"
+        },
+        {
+            "Id": "Locations/KingsVale/ItemShop",
+            "Description": "Potions R Us"
+        },
+        {
+            "Id": "Locations/KingsVale/EquipmentShop",
+            "Description": "Bronzebeard's Wares"
+        },
+        {
+            "Id": "Locations/KingsVale/ThroneRoom",
+            "Description": "To the Castle"
+        }
+    ],
+    "NPCs": [
+        {
+            "Name": "Helpful Man",
+            "Texts": [
+                "Some NPCs say multiple things! Try talking to me multiple times!",
+                "Cool, huh?",
+                "OK, that's enough now.",
+                "Quit it, yer botherin' me.",
+                "...",
+                "Guard! GUARD! This man is bothering me!"
+            ]
+        },
+        {
+            "Name": "Retired Hero",
+            "Texts": [
+                "Setting forth for adventure? Remember this well: monsters have different weaknesses. Some are weak against fire. Others, like the common goblin, are weak against swords."
+            ],
+            "OnTalk": {
+                "$type": "TextBlade.Core.Game.Actions.SetSwitchAction, TextBlade.Core",
+                "SwitchName": "MetRetiredHero",
+                "Value": true
+            }
+        }
+    ]
+}

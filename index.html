@@ -1,5 +1,93 @@
-<html><body>
-<label tabindex="0">Hello, world!</label>
-<button>cat</button>
-<button>dog</button>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vivid - Web Game Engine</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            text-align: center;
+            background-color: rgba(42, 42, 42, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            border: 2px solid #8b4513;
+        }
+        h1 {
+            font-size: 3rem;
+            color: #a0522d;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        .games {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .game-link {
+            display: inline-block;
+            background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+            color: #e0e0e0;
+            padding: 20px 40px;
+            text-decoration: none;
+            border: 2px solid #8b4513;
+            border-radius: 6px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        .game-link:hover {
+            background: linear-gradient(to bottom, #4a3020, #3a3a3a);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        .game-link:focus {
+            outline: 3px solid #a0522d;
+            outline-offset: 2px;
+        }
+        .docs-link {
+            color: #a0522d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .docs-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 tabindex="0">Vivid</h1>
+        <p tabindex="0">
+            A lightweight, accessible web-based game engine for creating choice-driven RPG adventures.
+        </p>
+        <p tabindex="0">
+            Designed for both blind and sighted players with full keyboard navigation and beautiful visuals.
+        </p>
+        
+        <div class="games">
+            <a href="time_eater/index.html" class="game-link" tabindex="0">Play Time Eater</a>
+        </div>
+        
+        <p style="margin-top: 40px;" tabindex="0">
+            <a href="engine/README.md" class="docs-link" tabindex="0">Read the Documentation</a>
+            to create your own game!
+        </p>
+    </div>
+</body>
+</html>

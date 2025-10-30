@@ -1,0 +1,12 @@
+{
+    "Name": "The King's Inn",
+    "Description": "A small, cozy inn with warm beds and a friendly innkeeper. The smell of fresh bread wafts from the kitchen.",
+    "ImageUrl": "https://via.placeholder.com/800x400/2a2a2a/8b4513?text=The+King's+Inn",
+    "LinkedLocations": [
+        {
+            "Id": "Locations/KingsVale/KingsVale",
+            "Description": "Back to King's Vale"
+        }
+    ],
+    "PricePerNight": 10
+}
