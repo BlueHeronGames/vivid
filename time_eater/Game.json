@@ -1,6 +1,7 @@
 {
     "GameName": "Time Eater",
     "StartingLocationId": "Locations/KingsVale/KingsVale",
+    "StartingGold": 500,
     "StartingParty": [
         {
             "Name": "Aisha",
@@ -26,5 +27,44 @@
             "SpecialDefense": 10,
             "Skills": ["Fire A", "Ice A", "Poison", "Heal"]
         }
-    ]
+    ],
+    "Monsters": {
+        "Goblin": {
+            "Health": 45,
+            "Strength": 15,
+            "Toughness": 3,
+            "Weakness": "Sword",
+            "Gold": 5,
+            "ExperiencePoints": 10
+        },
+        "Spider": {
+            "Health": 55,
+            "SkillPoints": 15,
+            "Strength": 15,
+            "Toughness": 5,
+            "Weakness": "Fire",
+            "Gold": 10,
+            "ExperiencePoints": 20,
+            "Skills": [{"Name": "Web", "Probability": 0.3}]
+        },
+        "Gargoyle": {
+            "Health": 75,
+            "Strength": 19,
+            "Toughness": 7,
+            "Weakness": "Ice",
+            "Gold": 25,
+            "ExperiencePoints": 40,
+            "Skills": [{"Name": "Stone Fist", "Probability": 0.25}]
+        }
+    },
+    "Skills": {
+        "Double Strike": {"DamageMultiplier": 2.0, "Cost": 10},
+        "Whirlwind": {"DamageMultiplier": 1.25, "Cost": 20, "Target": "AllEnemies"},
+        "Fire A": {"DamageMultiplier": 1.1, "Cost": 7, "DamageType": "Fire"},
+        "Ice A": {"DamageMultiplier": 1.5, "Cost": 7, "DamageType": "Ice"},
+        "Poison": {"DamageMultiplier": 0, "Cost": 10, "StatusInflicted": "Poison"},
+        "Heal": {"DamageMultiplier": 1.5, "Cost": 5, "Target": "SingleFriend"},
+        "Web": {"Cost": 10, "DamageMultiplier": 0, "StatusInflicted": "Paralyze"},
+        "Stone Fist": {"Cost": 7, "DamageMultiplier": 1.7}
+    }
 }
