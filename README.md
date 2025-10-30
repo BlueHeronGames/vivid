@@ -1,6 +1,3 @@
-\# Blind First Game
+# Vivid
 
-
-
-Prototype of an old-school 2D adventure game, made with blind accessibility in mind. All Typescript.
-
+Prototype game engine for creating old-school adventure games for blind and sighted players.
