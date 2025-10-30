@@ -237,6 +237,9 @@ class GameEngine {
         if (npc.OnTalk) {
             this.executeAction(npc.OnTalk);
         }
+
+        // Re-render choices in case conversation unlocked new options
+        this.renderChoices();
     }
 
     /**

@@ -19,6 +19,11 @@
         {
             "Id": "Locations/KingsVale/ThroneRoom",
             "Description": "To the Castle"
+        },
+        {
+            "Id": "Locations/NorthSeasideCave",
+            "Description": "Explore the North Seaside Cave",
+            "SwitchRequired": "TalkedTo_KingSulayman"
         }
     ],
     "NPCs": [
