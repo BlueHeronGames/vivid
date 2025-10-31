@@ -1,0 +1,14 @@
+{
+  "name": "vivid",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^9.3.1",
+    "@testing-library/jest-dom": "^6.4.2",
+    "jsdom": "^24.0.0",
+    "vitest": "^1.5.2"
+  }
+}

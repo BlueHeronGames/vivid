@@ -56,14 +56,16 @@
     </div>
 
     <!-- Game Engine -->
-    <script src="../engine/game-engine.js"></script>
-    
-    <!-- Initialize Game -->
-    <script>
+    <script type="module">
+        import { GameEngine } from '../engine/game-engine.js';
+        
         // Initialize the game when the page loads
         document.addEventListener('DOMContentLoaded', () => {
             const engine = new GameEngine();
             engine.init('Game.json');
+            
+            // Make available globally for debugging
+            window.gameEngine = engine;
         });
     </script>
 </body>
