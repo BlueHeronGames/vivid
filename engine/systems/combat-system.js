@@ -1,9 +1,10 @@
 import { BUTTON_TYPES } from '../ui/ui-manager.js';
 
 export class CombatSystem {
-    constructor(state, ui, gameData, { onVictory, onDefeat, onStateChange }) {
+    constructor(state, ui, audio, gameData, { onVictory, onDefeat, onStateChange }) {
         this.state = state;
         this.ui = ui;
+        this.audio = audio;
         this.gameData = gameData;
         this.onVictory = onVictory;
         this.onDefeat = onDefeat;
@@ -96,6 +97,10 @@ export class CombatSystem {
         const monster = this.currentCombat.monster;
         const damage = Math.max(1, (member.Strength || 0) - (monster.Toughness || 0));
         monster.CurrentHealth -= damage;
+        
+        // Play attack sound effect
+        this.#playAttackSound(member.Name);
+        
         this.ui.showQuickMessage(`${member.Name} attacks for ${damage} damage!`);
 
         setTimeout(() => this.#nextTurn(), 900);
@@ -118,6 +123,9 @@ export class CombatSystem {
         this.ui.disableChoices();
         member.CurrentSkillPoints -= skill.Cost || 0;
         const monster = this.currentCombat.monster;
+
+        // Play skill sound effect
+        this.#playSkillSound(skillName);
 
         if (skill.Target === 'SingleFriend') {
             const healAmount = Math.floor((member.Special || 0) * (skill.DamageMultiplier || 1));
@@ -176,6 +184,10 @@ export class CombatSystem {
         const target = aliveMembers[Math.floor(Math.random() * aliveMembers.length)];
         const damage = Math.max(1, (monster.Strength || 0) - (target.Toughness || 0));
         target.CurrentHealth -= damage;
+        
+        // Play monster sound effect
+        this.#playMonsterSound(monster.Name);
+        
         this.ui.showQuickMessage(`${monster.Name} attacks ${target.Name} for ${damage} damage!`);
 
         setTimeout(() => {
@@ -200,5 +212,26 @@ export class CombatSystem {
     #handleDefeat() {
         this.currentCombat = null;
         this.onDefeat();
+    }
+
+    #playAttackSound(characterName) {
+        // Try character-specific sound first, fall back to generic attack
+        const charSound = `audio/sfx/attacks/${characterName.toLowerCase().replace(/\s+/g, '-')}.wav`;
+        const genericSound = 'audio/sfx/attacks/attack.wav';
+        
+        // Attempt to play, will silently fail if file doesn't exist (browser handles this)
+        this.audio.playSoundEffect(charSound, {
+            onComplete: null
+        });
+    }
+
+    #playSkillSound(skillName) {
+        const skillSound = `audio/sfx/skills/${skillName.toLowerCase().replace(/\s+/g, '-')}.wav`;
+        this.audio.playSoundEffect(skillSound);
+    }
+
+    #playMonsterSound(monsterName) {
+        const monsterSound = `audio/sfx/monsters/${monsterName.toLowerCase().replace(/\s+/g, '-')}.wav`;
+        this.audio.playSoundEffect(monsterSound);
     }
 }

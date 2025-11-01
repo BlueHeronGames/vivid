@@ -203,6 +203,47 @@ Available CSS variables:
 - `--shadow`: Shadow color
 - `--button-hover`: Button hover color
 
+## Audio System
+
+Vivid includes a full-featured audio system supporting:
+
+- **Background Audio**: Looping ambient sounds and music for locations
+- **Sound Effects**: One-shot sounds for combat, skills, and actions
+- **Battle Music**: Automatic theme switching during combat
+- **Multiple Tracks**: Layer multiple ambient sounds
+- **Fade Transitions**: Smooth audio transitions between locations
+
+### Quick Audio Setup
+
+Add background audio to a location:
+
+```json
+{
+    "Name": "King's Vale",
+    "BackgroundAudio": "audio/bgse/town.ogg"
+}
+```
+
+Or layer multiple ambient sounds:
+
+```json
+{
+    "Name": "Cave",
+    "BackgroundAudios": ["audio/bgse/cave.ogg", "audio/bgse/dripping.ogg"]
+}
+```
+
+Configure battle music in Game.json:
+
+```json
+{
+    "GameName": "My Game",
+    "BattleTheme": "audio/bgm/battle.ogg"
+}
+```
+
+**See [Audio Documentation](audio/README.md) for complete audio features and setup.**
+
 ## Layout
 
 The game uses a VBox (vertical box) layout:

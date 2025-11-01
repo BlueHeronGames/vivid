@@ -6,6 +6,7 @@
 import { StorageService } from './core/storage-service.js';
 import { GameState } from './state/game-state.js';
 import { UIManager } from './ui/ui-manager.js';
+import { AudioManager } from './audio/audio-manager.js';
 import { ShopSystem } from './systems/shop-system.js';
 import { CombatSystem } from './systems/combat-system.js';
 import { DungeonSystem } from './systems/dungeon-system.js';
@@ -15,6 +16,7 @@ export class GameEngine {
     constructor(options = {}) {
         this.storage = new StorageService(options.storageKey);
         this.ui = new UIManager();
+        this.audio = new AudioManager();
         
         this.gameData = null;
         this.state = null;
@@ -70,6 +72,7 @@ export class GameEngine {
             this.activeMode = 'explore';
             
             this.#handleStateChange();
+            this.#playLocationAudio();
             this.#renderLocation();
         } catch (error) {
             this.pendingLocationNavigation = false;
@@ -98,7 +101,7 @@ export class GameEngine {
             onExitDungeon: () => this.#exitDungeon()
         });
         
-        this.combatSystem = new CombatSystem(this.state, this.ui, this.gameData, {
+        this.combatSystem = new CombatSystem(this.state, this.ui, this.audio, this.gameData, {
             onVictory: monster => this.#handleCombatVictory(monster),
             onDefeat: () => this.#handleCombatDefeat(),
             onStateChange: () => this.#handleStateChange()
@@ -144,6 +147,20 @@ export class GameEngine {
         });
         
         this.#renderChoices();
+    }
+
+    #playLocationAudio() {
+        if (!this.currentLocation) return;
+
+        // Support both single BackgroundAudio string and BackgroundAudios array
+        const audioFiles = this.currentLocation.BackgroundAudios || this.currentLocation.BackgroundAudio;
+        
+        if (audioFiles) {
+            this.audio.playBackgroundAudio(audioFiles);
+        } else {
+            // Stop any currently playing audio if location has none
+            this.audio.stopBackgroundAudio();
+        }
     }
 
     #renderChoices() {
@@ -241,6 +258,12 @@ export class GameEngine {
             return;
         }
         
+        // Fade out location audio and play battle theme
+        this.audio.fadeOutBackgroundAudio(500).then(() => {
+            const battleTheme = this.gameData.BattleTheme || 'audio/bgm/battle.ogg';
+            this.audio.playBackgroundAudio(battleTheme);
+        });
+        
         this.activeCombatContext = context;
         this.activeMode = 'combat';
         this.combatSystem.startEncounter(monsterName);
@@ -261,6 +284,10 @@ export class GameEngine {
     #afterCombatVictory() {
         const fromDungeon = Boolean(this.activeCombatContext?.fromDungeon);
         this.activeCombatContext = null;
+        
+        // Stop battle music and restore location audio
+        this.audio.stopBackgroundAudio();
+        this.#playLocationAudio();
         
         if (fromDungeon) {
             const result = this.dungeonSystem.handleVictory();
@@ -293,6 +320,10 @@ export class GameEngine {
     #afterCombatDefeat() {
         const fromDungeon = Boolean(this.activeCombatContext?.fromDungeon);
         this.activeCombatContext = null;
+        
+        // Stop battle music and restore location audio
+        this.audio.stopBackgroundAudio();
+        this.#playLocationAudio();
         
         if (fromDungeon) {
             this.dungeonSystem.handleDefeat();

@@ -2,6 +2,7 @@
     "Name": "North Seaside Cave",
     "Description": "You stand at the mouth of a salt-stained cavern. Waves crash somewhere behind you while something else stirs in the dark ahead.",
     "ImageUrl": "https://via.placeholder.com/800x400/1a1a2a/8b4513?text=North+Seaside+Cave",
+    "BackgroundAudios": ["audio/bgse/cave.ogg", "audio/bgse/bubbling.ogg"],
     "IsDungeon": true,
     "NumFloors": 5,
     "Monsters": ["Goblin", "Spider", "Gargoyle"],

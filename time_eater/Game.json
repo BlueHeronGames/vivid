@@ -2,6 +2,7 @@
     "GameName": "Time Eater",
     "StartingLocationId": "Locations/KingsVale/KingsVale",
     "StartingGold": 500,
+    "BattleTheme": "audio/bgm/battle.ogg",
     "StartingParty": [
         {
             "Name": "Aisha",

@@ -28,6 +28,7 @@ const buildGameData = () => ({
 describe('CombatSystem', () => {
   let state;
   let ui;
+  let audio;
   let gameData;
   let onVictory;
   let onDefeat;
@@ -60,12 +61,17 @@ describe('CombatSystem', () => {
       showQuickMessage: vi.fn()
     };
 
+    audio = {
+      playSoundEffect: vi.fn(),
+      playSoundSequence: vi.fn()
+    };
+
     gameData = buildGameData();
     onVictory = vi.fn();
     onDefeat = vi.fn();
     onStateChange = vi.fn();
 
-    combat = new CombatSystem(state, ui, gameData, { onVictory, onDefeat, onStateChange });
+    combat = new CombatSystem(state, ui, audio, gameData, { onVictory, onDefeat, onStateChange });
   });
 
   afterEach(() => {

@@ -2,7 +2,7 @@
     "Name": "King's Vale",
     "Description": "A small village ruled by King Sulayman, who lives in the castle in the north part of town.",
     "ImageUrl": "https://via.placeholder.com/800x400/2a2a2a/8b4513?text=King's+Vale",
-    "BackgroundAudio": "bgse/seagulls",
+    "BackgroundAudio": "audio/bgse/seagulls.ogg",
     "LinkedLocations": [
         {
             "Id": "Locations/KingsVale/Inn",
